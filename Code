@@ -1,0 +1,209 @@
+'use client'
+
+import { useState } from 'react'
+import { Button } from "@/components/ui/button"
+import { Input } from "@/components/ui/input"
+import { Label } from "@/components/ui/label"
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
+import { Checkbox } from "@/components/ui/checkbox"
+import { Slider } from "@/components/ui/slider"
+import { Switch } from "@/components/ui/switch"
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
+import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card"
+import { AlertCircle, FileIcon, Settings, Clock, List } from "lucide-react"
+import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert"
+
+export default function AdvancedMetadataManipulator() {
+  const [lnkFile, setLnkFile] = useState('')
+  const [operation, setOperation] = useState('')
+  const [value, setValue] = useState('')
+  const [isHidden, setIsHidden] = useState(false)
+  const [isReadOnly, setIsReadOnly] = useState(false)
+  const [isSystem, setIsSystem] = useState(false)
+  const [performanceMode, setPerformanceMode] = useState(false)
+  const [batchSize, setBatchSize] = useState(100)
+  const [result, setResult] = useState<{ success: boolean; message: string } | null>(null)
+  const [recentOperations, setRecentOperations] = useState<string[]>([])
+
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault()
+    try {
+      // Simulated API call
+      await new Promise(resolve => setTimeout(resolve, 1000))
+      const operationResult = `${operation} completed on ${lnkFile}`
+      setResult({ 
+        success: true, 
+        message: `Operation ${operationResult}`
+      })
+      setRecentOperations(prev => [operationResult, ...prev.slice(0, 4)])
+    } catch (error) {
+      setResult({ 
+        success: false, 
+        message: 'An error occurred while processing the request.'
+      })
+    }
+  }
+
+  return (
+    <div className="max-w-6xl mx-auto p-6 space-y-6">
+      <h1 className="text-3xl font-bold">Advanced LNK File Metadata Manipulator</h1>
+      <Tabs defaultValue="manipulator">
+        <TabsList>
+          <TabsTrigger value="manipulator">Manipulator</TabsTrigger>
+          <TabsTrigger value="settings">Settings</TabsTrigger>
+          <TabsTrigger value="history">History</TabsTrigger>
+        </TabsList>
+        <TabsContent value="manipulator">
+          <Card>
+            <CardHeader>
+              <CardTitle>LNK File Manipulation</CardTitle>
+              <CardDescription>Modify metadata of LNK files with advanced options</CardDescription>
+            </CardHeader>
+            <CardContent>
+              <form onSubmit={handleSubmit} className="space-y-4">
+                <div>
+                  <Label htmlFor="lnk-file">LNK File Path</Label>
+                  <Input 
+                    id="lnk-file" 
+                    value={lnkFile} 
+                    onChange={(e) => setLnkFile(e.target.value)}
+                    placeholder="C:\Users\Public\Desktop\myfile.lnk"
+                    required
+                  />
+                </div>
+                <div>
+                  <Label htmlFor="operation">Operation</Label>
+                  <Select onValueChange={setOperation} required>
+                    <SelectTrigger id="operation">
+                      <SelectValue placeholder="Select operation" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="name">Change File Name</SelectItem>
+                      <SelectItem value="date">Change File Date</SelectItem>
+                      <SelectItem value="size">Change File Size</SelectItem>
+                      <SelectItem value="path">Change File Path</SelectItem>
+                      <SelectItem value="icon">Change File Icon</SelectItem>
+                      <SelectItem value="target">Change File Target</SelectItem>
+                      <SelectItem value="arguments">Change Arguments</SelectItem>
+                      <SelectItem value="workingDir">Change Working Directory</SelectItem>
+                      <SelectItem value="description">Change Description</SelectItem>
+                      <SelectItem value="hotkey">Change Hotkey</SelectItem>
+                    </SelectContent>
+                  </Select>
+                </div>
+                <div>
+                  <Label htmlFor="value">New Value</Label>
+                  <Input 
+                    id="value" 
+                    value={value} 
+                    onChange={(e) => setValue(e.target.value)}
+                    placeholder="Enter new value"
+                    required
+                  />
+                </div>
+                <div className="flex flex-col space-y-2">
+                  <Label>File Attributes</Label>
+                  <div className="flex space-x-4">
+                    <div className="flex items-center space-x-2">
+                      <Checkbox 
+                        id="hidden" 
+                        checked={isHidden}
+                        onCheckedChange={(checked) => setIsHidden(checked as boolean)}
+                      />
+                      <Label htmlFor="hidden">Hidden</Label>
+                    </div>
+                    <div className="flex items-center space-x-2">
+                      <Checkbox 
+                        id="readonly" 
+                        checked={isReadOnly}
+                        onCheckedChange={(checked) => setIsReadOnly(checked as boolean)}
+                      />
+                      <Label htmlFor="readonly">Read-only</Label>
+                    </div>
+                    <div className="flex items-center space-x-2">
+                      <Checkbox 
+                        id="system" 
+                        checked={isSystem}
+                        onCheckedChange={(checked) => setIsSystem(checked as boolean)}
+                      />
+                      <Label htmlFor="system">System</Label>
+                    </div>
+                  </div>
+                </div>
+                <Button type="submit">Execute Operation</Button>
+              </form>
+            </CardContent>
+          </Card>
+        </TabsContent>
+        <TabsContent value="settings">
+          <Card>
+            <CardHeader>
+              <CardTitle>Advanced Settings</CardTitle>
+              <CardDescription>Configure performance and behavior options</CardDescription>
+            </CardHeader>
+            <CardContent className="space-y-4">
+              <div className="flex items-center justify-between">
+                <Label htmlFor="performance-mode">Performance Mode</Label>
+                <Switch 
+                  id="performance-mode"
+                  checked={performanceMode}
+                  onCheckedChange={setPerformanceMode}
+                />
+              </div>
+              <div>
+                <Label htmlFor="batch-size">Batch Processing Size</Label>
+                <Slider
+                  id="batch-size"
+                  min={10}
+                  max={1000}
+                  step={10}
+                  value={[batchSize]}
+                  onValueChange={(value) => setBatchSize(value[0])}
+                />
+                <div className="text-sm text-muted-foreground mt-1">Current: {batchSize} files</div>
+              </div>
+            </CardContent>
+          </Card>
+        </TabsContent>
+        <TabsContent value="history">
+          <Card>
+            <CardHeader>
+              <CardTitle>Recent Operations</CardTitle>
+              <CardDescription>Last 5 operations performed</CardDescription>
+            </CardHeader>
+            <CardContent>
+              <ul className="space-y-2">
+                {recentOperations.map((op, index) => (
+                  <li key={index} className="flex items-center space-x-2">
+                    <Clock className="h-4 w-4" />
+                    <span>{op}</span>
+                  </li>
+                ))}
+              </ul>
+            </CardContent>
+          </Card>
+        </TabsContent>
+      </Tabs>
+      {result && (
+        <Alert variant={result.success ? "default" : "destructive"}>
+          <AlertCircle className="h-4 w-4" />
+          <AlertTitle>{result.success ? "Success" : "Error"}</AlertTitle>
+          <AlertDescription>{result.message}</AlertDescription>
+        </Alert>
+      )}
+      <Card>
+        <CardHeader>
+          <CardTitle>File Preview</CardTitle>
+          <CardDescription>Quick view of the selected LNK file</CardDescription>
+        </CardHeader>
+        <CardContent className="flex items-center space-x-4">
+          <FileIcon className="h-12 w-12" />
+          <div>
+            <p className="font-medium">{lnkFile.split('\\').pop() || 'No file selected'}</p>
+            <p className="text-sm text-muted-foreground">{lnkFile || 'Select a file to view details'}</p>
+          </div>
+        </CardContent>
+      </Card>
+    </div>
+  )
+}
